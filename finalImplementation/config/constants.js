@@ -1,0 +1,17 @@
+// config/constants.js
+module.exports = {
+  USER_TYPES: {
+    doctor: 1,
+    patient: 2,
+    assistant: 3,
+  },
+  PERMISSIONS: {
+    READ_HISTORY: "READ_HISTORY",
+    READ_PRESCRIPTIONS: "READ_PRESCRIPTIONS",
+    READ_TEST_RESULTS: "READ_TEST_RESULTS",
+    READ_EMR: "READ_EMR",
+    WRITE_EMR: "WRITE_EMR",
+    ACCESS_RADIOLOGY: "ACCESS_RADIOLOGY",
+    ACCESS_CARDIOLOGY: "ACCESS_CARDIOLOGY",
+  },
+};

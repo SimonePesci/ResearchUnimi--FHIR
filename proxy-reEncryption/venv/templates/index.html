@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Proxy Re-Encryption Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        width: 800px;
+        margin: 0 auto;
+      }
+      .message {
+        margin: 10px 0;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+      form {
+        margin-bottom: 10px;
+      }
+      pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+        overflow-x: auto;
+      }
+      h2 {
+        border-bottom: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Proxy Re-Encryption with Flask and Umbral</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="message">
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <!-- Forms -->
+      <form action="/generate_keys">
+        <button type="submit">Generate Keys</button>
+      </form>
+
+      <form action="/encrypt" method="post">
+        <input
+          type="text"
+          name="message"
+          placeholder="Enter message to encrypt"
+          style="width: 400px"
+        />
+        <button type="submit">Encrypt Message</button>
+      </form>
+
+      <form action="/generate_kfrags">
+        <button type="submit">Generate KFrags</button>
+      </form>
+
+      <form action="/reencrypt">
+        <button type="submit">Re-Encrypt Capsule</button>
+      </form>
+
+      <form action="/decrypt">
+        <button type="submit">Decrypt Message</button>
+      </form>
+
+      <!-- Display Cryptographic Materials -->
+      <h2>Alice's Keys</h2>
+      {% if alices_secret_key %}
+      <p><strong>Alice's Secret Key:</strong></p>
+      <pre>{{ alices_secret_key|serialize }}</pre>
+      {% endif %} {% if alices_public_key %}
+      <p><strong>Alice's Public Key:</strong></p>
+      <pre>{{ alices_public_key|serialize }}</pre>
+      {% endif %} {% if alices_signing_key %}
+      <p><strong>Alice's Signing Key:</strong></p>
+      <pre>{{ alices_signing_key|serialize }}</pre>
+      {% endif %}
+
+      <h2>Bob's Keys</h2>
+      {% if bobs_secret_key %}
+      <p><strong>Bob's Secret Key:</strong></p>
+      <pre>{{ bobs_secret_key|serialize }}</pre>
+      {% endif %} {% if bobs_public_key %}
+      <p><strong>Bob's Public Key:</strong></p>
+      <pre>{{ bobs_public_key|serialize }}</pre>
+      {% endif %}
+
+      <h2>Encrypted Data</h2>
+      {% if ciphertext %}
+      <p><strong>Ciphertext:</strong></p>
+      <pre>{{ ciphertext|serialize }}</pre>
+      {% endif %} {% if capsule %}
+      <p><strong>Capsule:</strong></p>
+      <pre>{{ capsule|serialize }}</pre>
+      {% endif %}
+
+      <h2>KFrags</h2>
+      {% if kfrags %}
+      <p><strong>KFrags (Key Fragments):</strong></p>
+      <ul>
+        {% for kfrag in kfrags %}
+        <li><pre>{{ kfrag|serialize }}</pre></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <h2>CFrags</h2>
+      {% if cfrags %}
+      <p><strong>CFrags (Capsule Fragments):</strong></p>
+      <ul>
+        {% for cfrag in cfrags %}
+        <li><pre>{{ cfrag|serialize }}</pre></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <h2>Decrypted Message</h2>
+      {% if decrypted_message %}
+      <p><strong>Bob's Decrypted Message:</strong></p>
+      <pre>{{ decrypted_message }}</pre>
+      {% endif %}
+    </div>
+  </body>
+</html>
