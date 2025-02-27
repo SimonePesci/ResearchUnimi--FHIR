@@ -46,49 +46,49 @@ contract HospitalToken is ERC1155 {
     uint256 private tokenIdPatient = 0;
     uint256 private tokenIdAssistant = 0;
 
-    // Single mint function for all token types
-    function mint(uint256 tokenType, address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
-        require(tokenType == Doctor || tokenType == Patient || tokenType == Assistant, "Invalid token type");
-        require(balanceOf(account, tokenType) == 0, "This address already owns this token type.");
+    // Single mint function for all roles
+    function mint(uint256 role, address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
+        require(role == Doctor || role == Patient || role == Assistant, "Invalid role");
+        require(balanceOf(account, role) == 0, "This address already owns this role.");
         
         uint256 tokenId;
-        if (tokenType == Doctor) {
+        if (role == Doctor) {
             tokenIdDoctor++;
             tokenId = tokenIdDoctor;
-        } else if (tokenType == Patient) {
+        } else if (role == Patient) {
             tokenIdPatient++;
             tokenId = tokenIdPatient;
-        } else if (tokenType == Assistant) {
+        } else if (role == Assistant) {
             tokenIdAssistant++;
             tokenId = tokenIdAssistant;
         }
         
-        _mint(account, tokenType, 1, "");
-        tokenPersonalData[tokenType][tokenId] = PersonalData(name, surname, taxCode);
-        tokenPossession[account][tokenType] = tokenId;
-        addressTokenPossession[tokenType][tokenId] = account;
+        _mint(account, role, 1, "");
+        tokenPersonalData[role][tokenId] = PersonalData(name, surname, taxCode);
+        tokenPossession[account][role] = tokenId;
+        addressTokenPossession[role][tokenId] = account;
     }
 
     // Function used to retrieve information about the last user minted
-    function getLastMintedUser(uint256 tokenType, address accountOwner) public view returns (address account, uint256 tokenId, string memory name, string memory surname, string memory taxCode) {
+    function getLastMintedUser(uint256 role, address accountOwner) public view returns (address account, uint256 tokenId, string memory name, string memory surname, string memory taxCode) {
         uint256 tokenID;
-        require(balanceOf(accountOwner, tokenType) > 0, "Address does not own this token type.");
+        require(balanceOf(accountOwner, role) > 0, "Address does not own this role.");
 
-        tokenID = tokenPossession[accountOwner][tokenType];
+        tokenID = tokenPossession[accountOwner][role];
 
-        return (accountOwner, tokenID, tokenPersonalData[tokenType][tokenID].name, tokenPersonalData[tokenType][tokenID].surname, tokenPersonalData[tokenType][tokenID].taxCode);
+        return (accountOwner, tokenID, tokenPersonalData[role][tokenID].name, tokenPersonalData[role][tokenID].surname, tokenPersonalData[role][tokenID].taxCode);
     }
 
     // Function used to update hospital access rights for a specific token instance
-    function setHospitalAccess(uint256 tokenType, uint256 tokenID, uint256 hospitalId, bytes memory accessRights) public onlyOwner {
-        address owner = addressTokenPossession[tokenType][tokenID];
+    function setHospitalAccess(uint256 role, uint256 tokenID, uint256 hospitalId, bytes memory accessRights) public onlyOwner {
+        address owner = addressTokenPossession[role][tokenID];
         require(owner != address(0), "Token does not exist or has no owner.");
 
         // Find and update the specific hospital access rights for the given token instance
         bool hospitalFound = false;
-        for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
-            if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
-                tokenHospitalAccessRights[tokenType][tokenID][i].accessRights = accessRights;
+        for (uint256 i = 0; i < tokenHospitalAccessRights[role][tokenID].length; i++) {
+            if (tokenHospitalAccessRights[role][tokenID][i].hospitalId == hospitalId) {
+                tokenHospitalAccessRights[role][tokenID][i].accessRights = accessRights;
                 hospitalFound = true;
                 break;
             }
@@ -96,7 +96,7 @@ contract HospitalToken is ERC1155 {
 
         // If the hospital ID is not found, add a new entry
         if (!hospitalFound) {
-            tokenHospitalAccessRights[tokenType][tokenID].push(HospitalAccess({
+            tokenHospitalAccessRights[role][tokenID].push(HospitalAccess({
                 hospitalId: hospitalId,
                 accessRights: accessRights
             }));
@@ -104,21 +104,21 @@ contract HospitalToken is ERC1155 {
     }
 
     // Returns the access rights for a specified hospital associated with a specific token
-    function getHospitalPermissions(uint256 tokenType, uint256 tokenID, uint256 hospitalId) public view returns (bytes memory) {
-        address owner = addressTokenPossession[tokenType][tokenID];
+    function getHospitalPermissions(uint256 role, uint256 tokenID, uint256 hospitalId) public view returns (bytes memory) {
+        address owner = addressTokenPossession[role][tokenID];
         require(owner != address(0), "Token does not exist or has no owner.");
 
-        for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
-            if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
-                return tokenHospitalAccessRights[tokenType][tokenID][i].accessRights;
+        for (uint256 i = 0; i < tokenHospitalAccessRights[role][tokenID].length; i++) {
+            if (tokenHospitalAccessRights[role][tokenID][i].hospitalId == hospitalId) {
+                return tokenHospitalAccessRights[role][tokenID][i].accessRights;
             }
         }
         // Return an empty byte array if no permissions are set or if the hospitalId is not found
         return new bytes(0);
     }
 
-    function getAddressForToken(uint256 tokenType, uint256 tokenID) public view returns (address) {
-        address owner = addressTokenPossession[tokenType][tokenID];
+    function getAddressForToken(uint256 role, uint256 tokenID) public view returns (address) {
+        address owner = addressTokenPossession[role][tokenID];
         require(owner != address(0), "Token does not exist or has no owner.");
         return owner;
     }
@@ -134,3 +134,4 @@ contract HospitalToken is ERC1155 {
         return _owner;
     }
 }
+
