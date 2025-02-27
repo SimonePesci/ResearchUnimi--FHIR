@@ -26,10 +26,9 @@ contract HospitalToken is ERC1155 {
     // Access rights within each Hospital
     struct HospitalAccess {
         uint256 hospitalId;
-        bytes32 permissionsHash;
+        bytes accessRights;
     }
 
-    mapping(uint256 => mapping(uint256 => HospitalAccess[])) public tokenHospitalAccessRights;
 
     // Data associated with every person
     struct PersonalData {
@@ -38,61 +37,36 @@ contract HospitalToken is ERC1155 {
         string taxCode;
     }
     
-    mapping(uint256 => mapping(uint256 => PersonalData)) public tokenPersonalData;  // userType , tokenID -> personalData
-    mapping(uint256 => mapping(uint256 => address)) private addressTokenPossession; // userType , tokenID -> address
-
-    mapping(address => mapping(uint256 => uint256)) private tokenPossession; //  address , userType -> tokenID
+    mapping(uint256 => mapping(uint256 => HospitalAccess[])) public tokenHospitalAccessRights; // Role , tokenID -> hospitalAccess
+    mapping(uint256 => mapping(uint256 => PersonalData)) public tokenPersonalData;  // Role , tokenID -> personalData
+    mapping(uint256 => mapping(uint256 => address)) private addressTokenPossession; // Role , tokenID -> address
+    mapping(address => mapping(uint256 => uint256)) private tokenPossession; //  address , Role -> tokenID
 
     uint256 private tokenIdDoctor = 0;
     uint256 private tokenIdPatient = 0;
     uint256 private tokenIdAssistant = 0;
 
-    // Define hospital identifiers as constants
-    uint256 private constant H1 = 1;
-    uint256 private constant H2 = 2;
-    uint256 private constant H3 = 3;
-    uint256 private constant H4 = 4;
-
-    // Define constants for each permission bit
-    uint8 constant PERMISSION_READ_HISTORY = 0x01;
-    uint8 constant PERMISSION_READ_PRESCRIPTIONS = 0x02;
-    uint8 constant PERMISSION_READ_TEST_RESULTS = 0x04;
-    uint8 constant PERMISSION_UPDATE_EMR = 0x08;  // Example new permission bit for updating EMR
-    uint8 constant PERMISSION_RADIOLOGY_ROOM = 0x10;
-    uint8 constant PERMISSION_CARDIOLOGY_ROOM = 0x20;
-
-    // Functions to mint tokens for doctors, assistants, and patients
-    function mintDoctor(address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
-        require(balanceOf(account, Doctor) == 0, "This address already owns this token type.");
-        tokenIdDoctor++;
-        _mint(account, Doctor, 1, "");
-        tokenPersonalData[Doctor][tokenIdDoctor] = PersonalData(name, surname, taxCode);
-        tokenPossession[account][Doctor] = tokenIdDoctor;
-        addressTokenPossession[Doctor][tokenIdDoctor] = account;
-        // Initialize with empty permissions
-        initializeHospitalAccess(Doctor, tokenIdDoctor);
-    }
-
-    function mintPatient(address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
-        require(balanceOf(account, Patient) == 0, "This address already owns this token type.");
-        tokenIdPatient++;
-        _mint(account, Patient, 1, "");
-        tokenPersonalData[Patient][tokenIdPatient] = PersonalData(name, surname, taxCode);
-        tokenPossession[account][Patient] = tokenIdPatient;
-        addressTokenPossession[Patient][tokenIdPatient] = account;
-        // Initialize with empty permissions
-        initializeHospitalAccess(Patient, tokenIdPatient);
-    }
-
-    function mintAssistant(address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
-        require(balanceOf(account, Assistant) == 0, "This address already owns this token type.");
-        tokenIdAssistant++;
-        _mint(account, Assistant, 1, "");
-        tokenPersonalData[Assistant][tokenIdAssistant] = PersonalData(name, surname, taxCode);
-        tokenPossession[account][Assistant] = tokenIdAssistant;
-        addressTokenPossession[Assistant][tokenIdAssistant] = account;
-        // Initialize with empty permissions
-        initializeHospitalAccess(Assistant, tokenIdAssistant);
+    // Single mint function for all token types
+    function mint(uint256 tokenType, address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
+        require(tokenType == Doctor || tokenType == Patient || tokenType == Assistant, "Invalid token type");
+        require(balanceOf(account, tokenType) == 0, "This address already owns this token type.");
+        
+        uint256 tokenId;
+        if (tokenType == Doctor) {
+            tokenIdDoctor++;
+            tokenId = tokenIdDoctor;
+        } else if (tokenType == Patient) {
+            tokenIdPatient++;
+            tokenId = tokenIdPatient;
+        } else if (tokenType == Assistant) {
+            tokenIdAssistant++;
+            tokenId = tokenIdAssistant;
+        }
+        
+        _mint(account, tokenType, 1, "");
+        tokenPersonalData[tokenType][tokenId] = PersonalData(name, surname, taxCode);
+        tokenPossession[account][tokenType] = tokenId;
+        addressTokenPossession[tokenType][tokenId] = account;
     }
 
     // Function used to retrieve information about the last user minted
@@ -105,28 +79,16 @@ contract HospitalToken is ERC1155 {
         return (accountOwner, tokenID, tokenPersonalData[tokenType][tokenID].name, tokenPersonalData[tokenType][tokenID].surname, tokenPersonalData[tokenType][tokenID].taxCode);
     }
 
-    // Function used to initialize the array containing permissions for each Hospital (Sets permission to empty hash for each hospital)
-    function initializeHospitalAccess(uint256 tokenType, uint256 tokenID) internal {
-        // Iterate over each hospital ID
-        for (uint256 i = H1; i <= H4; i++) {
-            // Initialize access rights for this token at the given index for each hospital
-            tokenHospitalAccessRights[tokenType][tokenID].push(HospitalAccess({
-                hospitalId: i,
-                permissionsHash: bytes32(0) // Empty permissions hash
-            }));
-        }
-    }
-
     // Function used to update hospital access rights for a specific token instance
-    function setHospitalAccess(uint256 tokenType, uint256 tokenID, uint256 hospitalId, bytes32 permissionsHash) public onlyOwner {
+    function setHospitalAccess(uint256 tokenType, uint256 tokenID, uint256 hospitalId, bytes memory accessRights) public onlyOwner {
         address owner = addressTokenPossession[tokenType][tokenID];
-        // require(owner != address(0), "Token does not exist or has no owner.");
+        require(owner != address(0), "Token does not exist or has no owner.");
 
         // Find and update the specific hospital access rights for the given token instance
         bool hospitalFound = false;
         for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
             if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
-                tokenHospitalAccessRights[tokenType][tokenID][i].permissionsHash = permissionsHash;
+                tokenHospitalAccessRights[tokenType][tokenID][i].accessRights = accessRights;
                 hospitalFound = true;
                 break;
             }
@@ -136,23 +98,34 @@ contract HospitalToken is ERC1155 {
         if (!hospitalFound) {
             tokenHospitalAccessRights[tokenType][tokenID].push(HospitalAccess({
                 hospitalId: hospitalId,
-                permissionsHash: permissionsHash
+                accessRights: accessRights
             }));
         }
     }
 
-    // Returns the permissions hash for a specified hospital associated with a specific token
-    function getHospitalPermissionsHash(uint256 tokenType, uint256 tokenID, uint256 hospitalId) public view returns (bytes32) {
+    // Checks if the permission is granted for the specified hospital
+    function checkPermission(uint256 tokenType, uint256 tokenID, uint256 hospitalId, uint8 permission) public view returns (bool) {
+        for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
+            if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
+                bytes memory accessRights = tokenHospitalAccessRights[tokenType][tokenID][i].accessRights;
+                return (uint8(accessRights[0]) & permission) == permission;
+            }
+        }
+        return false;
+    }
+
+    // Returns the access rights for a specified hospital associated with a specific token
+    function getHospitalPermissions(uint256 tokenType, uint256 tokenID, uint256 hospitalId) public view returns (bytes memory) {
         address owner = addressTokenPossession[tokenType][tokenID];
-        // require(owner != address(0), "Token does not exist or has no owner.");
+        require(owner != address(0), "Token does not exist or has no owner.");
 
         for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
             if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
-                return tokenHospitalAccessRights[tokenType][tokenID][i].permissionsHash;
+                return tokenHospitalAccessRights[tokenType][tokenID][i].accessRights;
             }
         }
-        // Return 0 if no permissions are set or if the hospitalId is not found
-        return bytes32(0);
+        // Return an empty byte array if no permissions are set or if the hospitalId is not found
+        return new bytes(0);
     }
 
     function getAddressForToken(uint256 tokenType, uint256 tokenID) public view returns (address) {
