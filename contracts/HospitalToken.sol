@@ -103,17 +103,6 @@ contract HospitalToken is ERC1155 {
         }
     }
 
-    // Checks if the permission is granted for the specified hospital
-    function checkPermission(uint256 tokenType, uint256 tokenID, uint256 hospitalId, uint8 permission) public view returns (bool) {
-        for (uint256 i = 0; i < tokenHospitalAccessRights[tokenType][tokenID].length; i++) {
-            if (tokenHospitalAccessRights[tokenType][tokenID][i].hospitalId == hospitalId) {
-                bytes memory accessRights = tokenHospitalAccessRights[tokenType][tokenID][i].accessRights;
-                return (uint8(accessRights[0]) & permission) == permission;
-            }
-        }
-        return false;
-    }
-
     // Returns the access rights for a specified hospital associated with a specific token
     function getHospitalPermissions(uint256 tokenType, uint256 tokenID, uint256 hospitalId) public view returns (bytes memory) {
         address owner = addressTokenPossession[tokenType][tokenID];
