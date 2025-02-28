@@ -30,15 +30,7 @@ contract HospitalToken is ERC1155 {
     }
 
 
-    // Data associated with every person
-    struct PersonalData {
-        string name;
-        string surname;
-        string taxCode;
-    }
-    
     mapping(uint256 => mapping(uint256 => HospitalAccess[])) public tokenHospitalAccessRights; // Role , tokenID -> hospitalAccess
-    mapping(uint256 => mapping(uint256 => PersonalData)) public tokenPersonalData;  // Role , tokenID -> personalData
     mapping(uint256 => mapping(uint256 => address)) private addressTokenPossession; // Role , tokenID -> address
     mapping(address => mapping(uint256 => uint256)) private tokenPossession; //  address , Role -> tokenID
 
@@ -47,7 +39,7 @@ contract HospitalToken is ERC1155 {
     uint256 private tokenIdAssistant = 0;
 
     // Single mint function for all roles
-    function mint(uint256 role, address account, string memory name, string memory surname, string calldata taxCode) public onlyOwner {
+    function mint(uint256 role, address account) public onlyOwner {
         require(role == Doctor || role == Patient || role == Assistant, "Invalid role");
         require(balanceOf(account, role) == 0, "This address already owns this role.");
         
@@ -64,19 +56,18 @@ contract HospitalToken is ERC1155 {
         }
         
         _mint(account, role, 1, "");
-        tokenPersonalData[role][tokenId] = PersonalData(name, surname, taxCode);
         tokenPossession[account][role] = tokenId;
         addressTokenPossession[role][tokenId] = account;
     }
 
     // Function used to retrieve information about the last user minted
-    function getLastMintedUser(uint256 role, address accountOwner) public view returns (address account, uint256 tokenId, string memory name, string memory surname, string memory taxCode) {
+    function getLastMintedUser(uint256 role, address accountOwner) public view returns (address account, uint256 tokenId) {
         uint256 tokenID;
         require(balanceOf(accountOwner, role) > 0, "Address does not own this role.");
 
         tokenID = tokenPossession[accountOwner][role];
 
-        return (accountOwner, tokenID, tokenPersonalData[role][tokenID].name, tokenPersonalData[role][tokenID].surname, tokenPersonalData[role][tokenID].taxCode);
+        return (accountOwner, tokenID);
     }
 
     // Function used to update hospital access rights for a specific token instance
@@ -101,6 +92,17 @@ contract HospitalToken is ERC1155 {
                 accessRights: accessRights
             }));
         }
+    }
+
+    // Checks if the permission is granted for the specified hospital
+    function checkPermission(uint256 role, uint256 tokenID, uint256 hospitalId, uint8 permission) public view returns (bool) {
+        for (uint256 i = 0; i < tokenHospitalAccessRights[role][tokenID].length; i++) {
+            if (tokenHospitalAccessRights[role][tokenID][i].hospitalId == hospitalId) {
+                bytes memory accessRights = tokenHospitalAccessRights[role][tokenID][i].accessRights;
+                return (uint8(accessRights[0]) & permission) == permission;
+            }
+        }
+        return false;
     }
 
     // Returns the access rights for a specified hospital associated with a specific token
