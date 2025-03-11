@@ -1,4 +1,3 @@
-// services/permissionService.js
 const cassandraClient = require("../config/cassandra");
 const { hashPermissions } = require("../utils/helpers");
 const keccak256 = require("keccak256"); // Import keccak256 for hashing
@@ -93,7 +92,7 @@ async function storePermissionsOffChain(
  * @returns {boolean} - Whether the user has the specified permissions.
  */
 exports.verifyPermissions = async (contracts, query) => {
-  const { userType, tokenID, hospitalID, permission } = query; // Changed 'permissions' to 'permission'
+  const { userType, tokenID, hospitalID, permission } = query;
   const { hospitalTokenContract } = contracts;
 
   // Input Validation
