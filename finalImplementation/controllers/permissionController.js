@@ -1,4 +1,3 @@
-// controllers/permissionController.js
 const permissionService = require("../services/permissionService");
 
 /**
