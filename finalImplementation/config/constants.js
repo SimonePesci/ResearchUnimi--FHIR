@@ -1,4 +1,3 @@
-// config/constants.js
 module.exports = {
   USER_TYPES: {
     doctor: 1,
