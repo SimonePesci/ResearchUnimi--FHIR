@@ -1,4 +1,3 @@
-// controllers/userController.js
 const blockchainService = require("../services/blockchainService");
 
 /**
