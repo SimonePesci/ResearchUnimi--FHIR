@@ -1,4 +1,3 @@
-// routes/emrRoutes.js
 const express = require("express");
 const router = express.Router();
 const emrController = require("../controllers/emrContoller");
