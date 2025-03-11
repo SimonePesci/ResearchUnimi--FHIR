@@ -1,4 +1,3 @@
-// services/blockchainService.js
 const { hashPermissions } = require("../utils/helpers");
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256"); // Ensure you have this package installed
