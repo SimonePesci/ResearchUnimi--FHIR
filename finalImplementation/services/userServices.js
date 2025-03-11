@@ -1,4 +1,3 @@
-// services/userService.js
 const blockchainService = require("./blockchainService");
 const axios = require("axios");
 const cassandraClient = require("../config/cassandra");
