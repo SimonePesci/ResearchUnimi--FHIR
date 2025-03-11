@@ -1,4 +1,3 @@
-// controllers/emrController.js
 const emrService = require("../services/emrServices");
 
 exports.updateEMR = async (req, res) => {
