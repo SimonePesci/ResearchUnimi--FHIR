@@ -1,4 +1,3 @@
-// config/web3.js
 const { Web3 } = require("web3");
 const MyMerkleTree = require("../../build/contracts/MerkleTree.json");
 const HospitalToken = require("../../build/contracts/HospitalToken.json");
