@@ -1,4 +1,3 @@
-// config/cassandra.js
 const { Client: CassandraClient } = require("cassandra-driver");
 const cassandraClient = new CassandraClient({
   contactPoints: ["127.0.0.1:9042"],
