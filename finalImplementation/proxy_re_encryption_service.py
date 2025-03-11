@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, request, jsonify
 from umbral import (
     SecretKey, Signer, encrypt, decrypt_original, generate_kfrags,
@@ -26,16 +25,16 @@ def serialize_capsule(capsule: Capsule) -> str:
         capsule_bytes = bytes(capsule)
         return base64.b64encode(capsule_bytes).decode('utf-8')
     except AttributeError:
-        pass  # Proceed to the next method if bytes() is not supported
+        pass  
 
-    # Method 2: Using to_bytes() method (if available)
+    # Method 2: Using to_bytes()
     try:
         capsule_bytes = capsule.to_bytes()
         return base64.b64encode(capsule_bytes).decode('utf-8')
     except AttributeError:
-        pass  # Proceed to the next method if to_bytes() is not available
+        pass 
 
-    # Method 3: Using pickle serialization (use with caution)
+    # Method 3: Using pickle serialization 
     try:
         capsule_bytes = pickle.dumps(capsule)
         return base64.b64encode(capsule_bytes).decode('utf-8')
@@ -50,20 +49,19 @@ def deserialize_capsule(capsule_str: str) -> Capsule:
     # Decode from Base64
     capsule_bytes = base64.b64decode(capsule_str.encode('utf-8'))
 
-    # Method 1: Using Capsule.from_bytes() (if available)
+    # Method 1: Using Capsule.from_bytes() 
     try:
         return Capsule.from_bytes(capsule_bytes)
     except AttributeError:
-        pass  # Proceed to the next method if from_bytes() is not available
+        pass  
 
-    # Method 2: Using bytes() conversion (if supported)
-    # Note: This is less likely to be supported and is not recommended
+    # Method 2: Using bytes() conversion
     try:
         return Capsule.from_bytes(capsule_bytes)
     except AttributeError:
         pass
 
-    # Method 3: Using pickle deserialization (use with caution)
+    # Method 3: Using pickle deserialization 
     try:
         return pickle.loads(capsule_bytes)
     except Exception as e:
