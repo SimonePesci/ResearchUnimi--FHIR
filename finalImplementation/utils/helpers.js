@@ -1,4 +1,3 @@
-// utils/helpers.js
 const keccak256 = require("keccak256");
 
 exports.hashPermissions = (permissions) => {
