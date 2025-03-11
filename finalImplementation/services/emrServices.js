@@ -1,4 +1,3 @@
-// services/emrService.js
 // check the updateEMR, first get the merkle root, then update but with the encrypted data (put the prev data back on cassandra)
 const cassandraClient = require("../config/cassandra");
 const { web3, merkleTreeContract, owner } = require("../config/web3");
@@ -6,23 +5,21 @@ const axios = require("axios");
 const permissionService = require("./permissionService");
 const blockchainService = require("./blockchainService");
 const { PERMISSIONS } = require("../config/constants");
-const keccak256 = require("keccak256"); // <-- Imported keccak256
-const { MerkleTree } = require("merkletreejs"); // If not already imported
+const keccak256 = require("keccak256"); 
+const { MerkleTree } = require("merkletreejs"); 
 const { checkIntegrity } = require("../config/web3");
 
 // Define constants for patientId and doctorId
 const PATIENT_ID_CONSTANT = "patient_constant_id";
 const DOCTOR_ID_CONSTANT = "doctor_constant_id";
 
-// Updated updateEMR function
-// Updated updateEMR function
 exports.updateEMR = async (contracts, data) => {
   const {
     userType,
     tokenID,
     hospitalID,
     resource_type,
-    EMR_To_Update, // Assuming this is the resource_id
+    EMR_To_Update,
     new_EMR_Value,
   } = data;
 
@@ -288,15 +285,13 @@ exports.updateEMR = async (contracts, data) => {
 //   };
 // };
 
-// Implement accessEMR
-// Updated accessEMR function
 exports.accessEMR = async (contracts, data) => {
   const {
     userType,
     tokenID,
     hospitalID,
     resource_type,
-    EMR_To_Access, // Assuming this is the resource_id
+    EMR_To_Access,
     version_id,
   } = data;
 
@@ -366,7 +361,7 @@ exports.accessEMR = async (contracts, data) => {
     try {
       decryptResponse = await axios.post("http://127.0.0.1:5000/decrypt_emr", {
         doctor_id: DOCTOR_ID_CONSTANT,
-        patient_id: "patient_constant_id", // Replace with actual patient_id if dynamic
+        patient_id: "patient_constant_id", 
         capsule: capsule,
         ciphertext: ciphertext,
       });
