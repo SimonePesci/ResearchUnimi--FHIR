@@ -1,0 +1,23 @@
+{
+  "name": "finalimplementation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "cassandra-driver": "^4.8.0",
+    "dotenv": "^16.6.0",
+    "express": "^5.1.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.5.2",
+    "uuid": "^11.1.0",
+    "web3": "^4.16.0"
+  }
+}
