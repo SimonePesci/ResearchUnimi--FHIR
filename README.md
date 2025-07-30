@@ -1,13 +1,10 @@
-# SafeMed: Decentralized EMR Management System
+# BlockHealth: Decentralized EMR Management System
 
 This project is a secure, decentralized Electronic Medical Record (EMR) management system that leverages blockchain technology, proxy re-encryption, and a microservices architecture to ensure data integrity, security, and controlled access.
 
 ## System Architecture
 
 The system is composed of two main backend services, a blockchain for trust and an off-chain database for encrypted data storage.
-
-![System Architecture Diagram](https://i.imgur.com/your-diagram-image-link.png)
-_You can upload the diagram generated earlier and replace this link._
 
 - **JS Proxy Service (Node.js/Express)**: The main entry point for the client application. It handles business logic, user authentication, permission management, and orchestrates communication with other services.
 - **Proxy Re-Encryption Service (Python/Flask)**: Manages all cryptographic operations. It handles EMR encryption, key generation, and re-encryption for secure data sharing between patients and doctors.
@@ -42,8 +39,8 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd <your-project-folder>
+git clone https://github.com/SimonePesci/ResearchUnimi--FHIR.git
+cd ResearchUnimi--FHIR
 ```
 
 ### 2. Set up Cassandra
@@ -184,9 +181,6 @@ Creates a new user (Doctor, Patient, or Assistant) on the blockchain and generat
   {
     "userType": "doctor",
     "address": "<ethereum-address-of-user>",
-    "name": "John",
-    "surname": "Doe",
-    "taxCode": "TAXCODE123"
   }
   ```
 
@@ -219,7 +213,8 @@ Adds a new, encrypted EMR to the system.
     "tokenID": "1",
     "hospitalID": 1,
     "resource_type": "Observation",
-    "EMR_Value": "Blood Pressure: 120/80 mmHg"
+    "EMR_Value": "{\"resourceType\":\"Patient\",\"id\":\"example-patient-1\",\"meta\":{\"versionId\":\"1\",\"lastUpdated\":\"2023-07-15T12:00:00Z\"},\"name\":[{\"use\":\"official\",\"family\":\"Smith\",\"given\":[\"John\"]}],\"gender\":\"male\",\"birthDate\":\"1970-01-01\",\"address\":[{\"use\":\"home\",\"line\":[\"123 Main St\"],\"city\":\"Anytown\",\"state\":\"CA\",\"postalCode\":\"12345\",\"country\":\"USA\"}]}",
+  "resource_id" : "example-patient-1"
   }
   ```
 
