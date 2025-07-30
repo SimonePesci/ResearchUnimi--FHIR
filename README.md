@@ -22,6 +22,12 @@ The system is composed of two main backend services, a blockchain for trust and 
 
 ---
 
+## Database
+
+For detailed information on the Cassandra database schema, including table structures and example records, please see the [Database Documentation](./docs/README.MD).
+
+---
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -77,16 +83,6 @@ CREATE TABLE user_permissions (
   hospital_id int,
   permissions text,
   PRIMARY KEY ((user_type, token_id), hospital_id)
-);
-
-CREATE TABLE patient_keys (
-  patient_id text PRIMARY KEY,
-  public_key text
-);
-
-CREATE TABLE doctor_keys (
-  doctor_id text PRIMARY KEY,
-  public_key text
 );
 
 exit;
@@ -180,7 +176,7 @@ Creates a new user (Doctor, Patient, or Assistant) on the blockchain and generat
   ```json
   {
     "userType": "doctor",
-    "address": "<ethereum-address-of-user>",
+    "address": "<ethereum-address-of-user>"
   }
   ```
 
@@ -214,7 +210,7 @@ Adds a new, encrypted EMR to the system.
     "hospitalID": 1,
     "resource_type": "Observation",
     "EMR_Value": "{\"resourceType\":\"Patient\",\"id\":\"example-patient-1\",\"meta\":{\"versionId\":\"1\",\"lastUpdated\":\"2023-07-15T12:00:00Z\"},\"name\":[{\"use\":\"official\",\"family\":\"Smith\",\"given\":[\"John\"]}],\"gender\":\"male\",\"birthDate\":\"1970-01-01\",\"address\":[{\"use\":\"home\",\"line\":[\"123 Main St\"],\"city\":\"Anytown\",\"state\":\"CA\",\"postalCode\":\"12345\",\"country\":\"USA\"}]}",
-  "resource_id" : "example-patient-1"
+    "resource_id": "example-patient-1"
   }
   ```
 

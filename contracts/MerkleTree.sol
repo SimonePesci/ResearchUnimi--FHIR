@@ -6,7 +6,7 @@ contract MerkleTree {
 
     // Calculated from EMRs in EMRValues.json
     bytes32 public merkleRoot = 
-        0xb750bb6ce7580380afdf3510ed8100dd91242d9bebf2596423b461f215efd5ef;
+        0xc1bff66fad0552ba772eb363081a3405d470650282764189ac7ad9173f2b2127;
         
 
     // --- FUNCTIONS ---- //

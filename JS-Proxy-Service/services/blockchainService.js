@@ -4,55 +4,36 @@ const keccak256 = require("keccak256"); // Ensure you have this package installe
 const { web3Config } = require("../config/web3");
 
 /**
- * Creates a user on the blockchain.
+ * Creates a user on the blockchain by minting an NFT.
  *
  * @param {string} userType - The type of user ("doctor", "assistant", "patient").
  * @param {string} address - The user's Ethereum address.
- * @param {string} name - The user's first name.
- * @param {string} surname - The user's last name.
- * @param {string} taxCode - The user's tax code.
- * @returns {Object} - The data of the created user.
+ * @returns {Promise<Object>} - The data of the created user, including token ID.
  */
-exports.createUserOnBlockchain = async (
-  userType,
-  address,
-  name,
-  surname,
-  taxCode
-) => {
+exports.createUserOnBlockchain = async (userType, address) => {
   const { hospitalTokenContract, owner } = web3Config;
-  let data, data2;
+
+  const roleMap = {
+    doctor: 1,
+    patient: 2,
+    assistant: 3,
+  };
+
+  const role = roleMap[userType];
+  if (!role) {
+    throw new Error("Invalid user type provided.");
+  }
 
   try {
-    if (userType === "doctor") {
-      data = await hospitalTokenContract.methods
-        .mintDoctor(address, name, surname, taxCode)
-        .send({ from: owner, gas: 5000000 });
+    await hospitalTokenContract.methods
+      .mint(role, address)
+      .send({ from: owner, gas: 5000000 });
 
-      data2 = await hospitalTokenContract.methods
-        .getLastMintedUser(1, address)
-        .call();
-    } else if (userType === "assistant") {
-      data = await hospitalTokenContract.methods
-        .mintAssistant(address, name, surname, taxCode)
-        .send({ from: owner, gas: 5000000 });
+    const data = await hospitalTokenContract.methods
+      .getLastMintedUser(role, address)
+      .call();
 
-      data2 = await hospitalTokenContract.methods
-        .getLastMintedUser(3, address)
-        .call();
-    } else if (userType === "patient") {
-      data = await hospitalTokenContract.methods
-        .mintPatient(address, name, surname, taxCode)
-        .send({ from: owner, gas: 5000000 });
-
-      data2 = await hospitalTokenContract.methods
-        .getLastMintedUser(2, address)
-        .call();
-    } else {
-      throw new Error("Invalid user type provided.");
-    }
-
-    return data2;
+    return data;
   } catch (error) {
     console.error("Error creating user on blockchain:", error);
     throw error;
