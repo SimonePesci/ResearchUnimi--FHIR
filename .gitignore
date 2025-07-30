@@ -211,6 +211,9 @@ build/
 
 fhir/
 
-calculate_averages.py
+node_modules
+/node_modules
+/JS-Proxy-Service/node_modules
 
+calculate_averages.py
 stringify.js
