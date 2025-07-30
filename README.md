@@ -134,16 +134,7 @@ The service will run on `http://localhost:3000`.
 
 #### b) Proxy Re-Encryption Service
 
-First, create a `requirements.txt` file in the `proxy-reEncryption` directory.
-
-**/proxy-reEncryption/requirements.txt**
-
-```
-Flask
-umbral
-```
-
-Now, install the dependencies and run the service. It is recommended to use a virtual environment.
+First, install the dependencies and run the service. It is recommended to use a virtual environment.
 
 ```bash
 cd proxy-reEncryption
@@ -155,7 +146,7 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 
 # Start the service
-python app.py
+python ../JS-Proxy-Service/proxy_re_encryption_service.py
 ```
 
 The service will run on `http://localhost:5001`.
