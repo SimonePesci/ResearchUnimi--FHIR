@@ -8,8 +8,8 @@ const { PERMISSIONS, PROXY_RE_ENCRYPTION_URL } = require("../config/constants");
 const keccak256 = require("keccak256");
 const { MerkleTree } = require("merkletreejs");
 
-const PATIENT_ID_CONSTANT = "patient_constant_id";
-const DOCTOR_ID_CONSTANT = "doctor_constant_id";
+const PATIENT_ID_CONSTANT = "patient1";
+const DOCTOR_ID_CONSTANT = "doctor1";
 
 const _encryptEMR = async (patientId, plaintext) => {
   try {
@@ -178,20 +178,21 @@ exports.accessEMR = async (data) => {
   }
 
   const { capsule, ciphertext } = JSON.parse(emrData);
-  const decryptResponse = await axios.post(
-    `${PROXY_RE_ENCRYPTION_URL}/decrypt_emr`,
-    {
-      patient_id: PATIENT_ID_CONSTANT,
-      doctor_id: DOCTOR_ID_CONSTANT,
-      capsule: capsule,
-      ciphertext: ciphertext,
-    }
-  );
 
+  // Return encrypted data instead of decrypting server-side
+  // User must decrypt client-side using the proxy re-encryption service
   return {
     success: true,
-    message: "EMR accessed successfully",
-    emrData: decryptResponse.data.plaintext,
+    message: "EMR retrieved successfully (encrypted)",
+    encryptedEMR: {
+      capsule,
+      ciphertext,
+    },
+    patient_id: PATIENT_ID_CONSTANT,
+    doctor_id: DOCTOR_ID_CONSTANT,
+    decryptionEndpoint: `${PROXY_RE_ENCRYPTION_URL}/decrypt_emr`,
+    decryptionInstructions:
+      "Use the provided capsule and ciphertext to decrypt via the decryptionEndpoint",
   };
 };
 
