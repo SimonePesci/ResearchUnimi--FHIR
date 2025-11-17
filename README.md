@@ -45,8 +45,8 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/SimonePesci/ResearchUnimi--FHIR.git
-cd ResearchUnimi--FHIR
+git clone https://github.com/SimonePesci/BlockHealth.git
+cd BlockHealth
 ```
 
 ### 2. Set up Cassandra
